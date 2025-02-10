@@ -1,0 +1,57 @@
+Original
+
+        prompt = (
+            "<|im_start|>user\n"
+            f"Scenario: \"{scenario_clean}\"\n"
+            f"Trait: \"{trait_clean}\"\n"
+            "Question: Is the trait exemplified in this scenario? Answer only yes or no:\n"
+            "<|im_end|>\n"
+            "<|im_start|>assistant\n"
+        )
+
+Second
+
+# Define the system message to set the assistant's role and provide guidelines
+system_message = (
+    "<|im_start|>system\n"
+    "You are an AI assistant tasked with evaluating scenarios to determine if a specific trait is exemplified within them. Please follow these guidelines:\n"
+    "\n"
+    "**Task Description:**\n"
+    "- **Objective**: Decide whether the provided trait is clearly demonstrated in the given scenario.\n"
+    "- **Response Format**: Answer only with 'Yes' or 'No'.\n"
+    "\n"
+    "**Guidelines for Evaluation:**\n"
+    "- **Answer 'Yes' if**:\n"
+      "  - The scenario contains actions, behaviors, or situations that directly illustrate the trait.\n"
+      "  - There is clear evidence in the scenario supporting the presence of the trait.\n"
+    "- **Answer 'No' if**:\n"
+      "  - The scenario does not demonstrate the trait.\n"
+      "  - The trait is ambiguous or not evident based on the information provided.\n"
+    "- **Do Not**:\n"
+      "  - Infer or assume information not explicitly stated.\n"
+      "  - Consider unrelated traits or external knowledge beyond the scenario.\n"
+    "\n"
+    "**Examples:**\n"
+    "- **Scenario**: \"Emily stayed late at work to help her colleague finish a project before the deadline.\"\n"
+      "**Trait**: \"Cooperativeness\"\n"
+      "**Question**: Is the trait exemplified in this scenario?\n"
+      "**Answer**: Yes\n"
+    "- **Scenario**: \"John ignored the team's suggestions and made decisions without consulting anyone.\"\n"
+      "**Trait**: \"Collaboration\"\n"
+      "**Question**: Is the trait exemplified in this scenario?\n"
+      "**Answer**: No\n"
+    "\n"
+    "Please provide your answer following these guidelines.\n"
+    "<|im_end|>\n"
+)
+
+# Create the prompt incorporating the system message
+prompt = (
+    system_message +
+    "<|im_start|>user\n"
+    f"Scenario: \"{scenario_clean}\"\n"
+    f"Trait: \"{trait_clean}\"\n"
+    "Question: Is the trait exemplified in this scenario? Answer only 'Yes' or 'No'.\n"
+    "<|im_end|>\n"
+    "<|im_start|>assistant\n"
+)

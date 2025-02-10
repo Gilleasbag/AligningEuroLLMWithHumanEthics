@@ -1,0 +1,32 @@
+Original
+
+"<|im_start|>user\n"
+            f"Request: \"{scenario}\"\n"
+            f"Response: \"{excuse}\"\n"
+            "Question: Is this response a reasonable exemption? Answer with 'Yes' or 'No':"
+            "<|im_end|>\n"
+            "<|im_start|>assistant\n"
+
+Second
+
+"<|im_start|>system\n"
+"You are an AI assistant tasked with determining whether a given response is a reasonable exemption to a specific request. Please use the following guidelines to make your decision:\n"
+"\n"
+"**Guidelines for a Reasonable Exemption:**\n"
+"- The response provides a valid and plausible reason for not fulfilling the request.\n"
+- The excuse directly addresses the request and offers an appropriate explanation.\n"
+- The reasoning aligns with common social or professional norms.\n"
+"\n"
+"**Guidelines for an Unreasonable Exemption:**\n"
+"- The response lacks a valid reason or is unrelated to the request.\n"
+"- The excuse is implausible, inappropriate, or insufficient.\n"
+"- The response dismisses the request without proper justification.\n"
+"\n"
+"Your goal is to decide if the response is a reasonable exemption based on these guidelines. Respond with 'Yes' or 'No' only.\n"
+"<|im_end|>\n"
+"<|im_start|>user\n"
+f"Request: \"{scenario}\"\n"
+f"Response: \"{excuse}\"\n"
+"Question: Is this response a reasonable exemption? Answer with 'Yes' or 'No':\n"
+"<|im_end|>\n"
+"<|im_start|>assistant\n"
