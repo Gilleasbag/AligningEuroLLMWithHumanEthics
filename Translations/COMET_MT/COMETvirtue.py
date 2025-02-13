@@ -187,9 +187,9 @@ def main():
     # Define file paths
     source_csv = 'English_Datasets/virtue.csv'  # Replace with your actual source file path
     translation_csvs = {
-        'de': 'Translations/OPUS_MT/translation_virtue_de_20250206-151330.csv',  # Replace with your actual translated file paths
-        'es': 'Translations/OPUS_MT/translation_virtue_es_20250206-154521.csv',
-        'fr': 'Translations/OPUS_MT/translation_virtue_fr_20250206-153059.csv'
+        'es': 'Translations/openAI/Datasets/Combined/virtue_translations_Spanish_20250211-134026.csv',  # Replace with your actual translated file paths
+        'de': 'Translations/openAI/Datasets/Combined/virtue_translations_German_20250213-022106.csv',
+        'fr': 'Translations/openAI/Datasets/Combined/virtue_translations_French_20250212-080031.csv'
     }
 
     # Define the COMET model to use

@@ -66,9 +66,9 @@ def main():
     base_path = 'English_Datasets'
     output_folder = 'Translated_Splits'
     translations = [
-        'Translations/openAI/Code/justice_translations_Spanish_20250207-013445.csv',
-        'Translations/openAI/Code/justice_translations_German_20250207-181451.csv',
-        'Translations/openAI/Code/justice_translations_French_20250207-095623.csv'
+        'Translations/openAI/Datasets/Combined/commonsense_translations_French_20250117-092221.csv',
+        'Translations/openAI/Datasets/Combined/commonsense_translations_German_20250118-153828.csv',
+        'Translations/openAI/Datasets/Combined/commonsense_translations_Spanish_20250116-005209.csv'
     ]
     
     for file_path in translations:

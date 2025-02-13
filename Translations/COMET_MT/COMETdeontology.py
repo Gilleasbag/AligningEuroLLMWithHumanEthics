@@ -105,9 +105,9 @@ def main():
     # Define file paths
     source_csv = 'English_Datasets/deontology.csv'
     translation_csvs = {
-        'fr': 'Translations/OPUS_MT/Datasets/Combined/translation_results_deontology_fr_20250116-151128.csv',
-        'de': 'Translations/OPUS_MT/Datasets/Combined/translation_results_deontology_de_20250116-152315.csv',
-        'es': 'Translations/OPUS_MT/Datasets/Combined/translation_results_deontology_es_20250116-145902.csv'
+        'fr': 'Translations/openAI/Datasets/Combined/deontology_translations_French_20250211-203527.csv',
+        'de': 'Translations/openAI/Datasets/Combined/deontology_translations_German_20250212-085007.csv',
+        'es': 'Translations/openAI/Datasets/Combined/deontology_translations_Spanish_20250211-075051.csv'
     }
 
     # Define the COMET model to use

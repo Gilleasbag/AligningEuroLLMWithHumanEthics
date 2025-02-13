@@ -176,9 +176,9 @@ def main():
     # Define file paths for the utility dataset.
     source_csv = 'English_Datasets/utilitarianism.csv'  
     translation_csvs = {
-        'de': 'Translations/OPUS_MT/Datasets/Combined/translation_results_utilitarianism_de_20250116-160344.csv',  
-        'es': 'Translations/OPUS_MT/Datasets/Combined/translation_results_utilitarianism_es_20250116-152604.csv',
-        'fr': 'Translations/OPUS_MT/Datasets/Combined/translation_results_utilitarianism_fr_20250116-154601.csv'
+        'de': 'Translations/openAI/Datasets/Combined/utilitarianism_translations_German_20250212-112737.csv',  
+        'es': 'Translations/openAI/Datasets/Combined/utilitarianism_translations_Spanish_20250211-083810.csv',
+        'fr': 'Translations/openAI/Datasets/Combined/utilitarianism_translations_French_20250211-221050.csv'
     }
 
     # Define the COMET model to use.
