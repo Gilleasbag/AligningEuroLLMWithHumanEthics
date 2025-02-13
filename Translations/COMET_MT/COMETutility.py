@@ -174,12 +174,15 @@ def plot_score_distribution(scores, label):
 
 def main():
     # Define file paths for the utility dataset.
-    source_csv = 'English_Datasets/utilitarianism.csv'  
+    base_path = "/fs/nas/eikthyrnir0/gpeterson/"
+
+    source_csv = f'{base_path}English_Datasets/utilitarianism.csv'  
     translation_csvs = {
-        'de': 'Translations/openAI/Datasets/Combined/utilitarianism_translations_German_20250212-112737.csv',  
-        'es': 'Translations/openAI/Datasets/Combined/utilitarianism_translations_Spanish_20250211-083810.csv',
-        'fr': 'Translations/openAI/Datasets/Combined/utilitarianism_translations_French_20250211-221050.csv'
+        'de': f'{base_path}Translations/openAI/Datasets/Combined/utilitarianism_translations_German_20250212-112737.csv',  
+        'es': f'{base_path}Translations/openAI/Datasets/Combined/utilitarianism_translations_Spanish_20250211-083810.csv',
+        'fr': f'{base_path}Translations/openAI/Datasets/Combined/utilitarianism_translations_French_20250211-221050.csv'
     }
+    
 
     # Define the COMET model to use.
     comet_model_name = "Unbabel/wmt22-cometkiwi-da"

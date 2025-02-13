@@ -102,12 +102,14 @@ def plot_score_distribution(scores, label):
     print(f"Score distribution plot saved as comet_score_distribution_{label}.png")
 
 def main():
-    # Define file paths
-    source_csv = 'English_Datasets/deontology.csv'
+    # Define file paths (UPDATE THESE TO ABSOLUTE PATHS)
+    base_path = "/fs/nas/eikthyrnir0/gpeterson/"
+    
+    source_csv = f"{base_path}English_Datasets/deontology.csv"
     translation_csvs = {
-        'fr': 'Translations/openAI/Datasets/Combined/deontology_translations_French_20250211-203527.csv',
-        'de': 'Translations/openAI/Datasets/Combined/deontology_translations_German_20250212-085007.csv',
-        'es': 'Translations/openAI/Datasets/Combined/deontology_translations_Spanish_20250211-075051.csv'
+        'fr': f"{base_path}Translations/openAI/Datasets/Combined/deontology_translations_French_20250211-203527.csv",
+        'de': f"{base_path}Translations/openAI/Datasets/Combined/deontology_translations_German_20250212-085007.csv",
+        'es': f"{base_path}Translations/openAI/Datasets/Combined/deontology_translations_Spanish_20250211-075051.csv"
     }
 
     # Define the COMET model to use

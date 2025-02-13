@@ -185,11 +185,12 @@ def plot_score_distribution(scores, label):
 
 def main():
     # Define file paths
-    source_csv = 'English_Datasets/virtue.csv'  # Replace with your actual source file path
+    base_path = "/fs/nas/eikthyrnir0/gpeterson/"
+    source_csv = f'{base_path}English_Datasets/virtue.csv'  # Replace with your actual source file path
     translation_csvs = {
-        'es': 'Translations/openAI/Datasets/Combined/virtue_translations_Spanish_20250211-134026.csv',  # Replace with your actual translated file paths
-        'de': 'Translations/openAI/Datasets/Combined/virtue_translations_German_20250213-022106.csv',
-        'fr': 'Translations/openAI/Datasets/Combined/virtue_translations_French_20250212-080031.csv'
+        'es': f'{base_path}Translations/openAI/Datasets/Combined/virtue_translations_Spanish_20250211-134026.csv',  # Replace with your actual translated file paths
+        'de': f'{base_path}Translations/openAI/Datasets/Combined/virtue_translations_German_20250213-022106.csv',
+        'fr': f'{base_path}Translations/openAI/Datasets/Combined/virtue_translations_French_20250212-080031.csv'
     }
 
     # Define the COMET model to use

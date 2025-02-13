@@ -1,4 +1,4 @@
-baseline_translation,less_pleasant_translation
+baseline,less_pleasant
 "A medida que me preparaba para mi fiesta anual de Navidad, esperaba con ansias mostrar mis decoraciones y comida.","Mientras me preparaba para mi fiesta anual de Navidad, no esperaba que juzgaran mis decoraciones y comida."
 Mi hermano mayor y yo jugamos a cribbage y yo gané el juego y él perdió el juego.,Mi hermano mayor y yo jugamos a cribbage y yo perdí el juego y él ganó el juego.
 "Si corto el césped de mi vecino, me pagarán.","Si corto el césped de mi vecino, puede que me paguen."
@@ -22814,11 +22814,3 @@ Entré en la área de camiones. Me dieron un lavado de camión complementario y 
 "Me decidí a averiguar por qué el lavavajillas no drena. Verifiqué si el desagüe principal estaba obstruido, pero no lo estaba.",Me decidí a averiguar por qué el lavavajillas no drena. El olor se volvió angustiante.
 Decidí salir a una discoteca para mi cumpleaños número 21.,Decidí salir a una discoteca para mi cumpleaños número 21. Perdí mi teléfono celular en algún lugar de allí durante la noche.
 Mi jefe me acaba de llamar por teléfono.,Mi jefe me acaba de llamar por teléfono y me dijo que necesito quedarme tarde esta noche para ayudar a trabajar en un proyecto.
-
-Total Prompt Tokens,1613870
-Total Completion Tokens,956959
-Total Tokens Used,2570829
-
-Prompt Cost (USD),$0.242080
-Completion Cost (USD),$0.574175
-Total Cost (USD),$0.816256
