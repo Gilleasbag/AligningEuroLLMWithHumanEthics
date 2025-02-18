@@ -17,6 +17,9 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 YES_REGEX = re.compile(r'\boui\b', re.IGNORECASE)
 NO_REGEX = re.compile(r'\bnon\b', re.IGNORECASE)
 
+# Absolute path to the directory containing the translated CSV datasets.
+DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Deontology"
+
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -26,20 +29,34 @@ def setup_device():
         print("Using CPU")
     return device
 
-def load_and_prepare_data():
+def load_and_prepare_data(language="french"):
     """
-    Loads two local CSV files for the deontology dataset:
-      - The 'test' CSV file is loaded from 'translated_deontology_test.csv'
-      - The 'hard_test' CSV file is loaded from 'translated_deontology_hard_test.csv'
-      
-    Both are loaded via the Hugging Face CSV loader and returned in a DatasetDict.
+        The CSV files are expected at:
+    {DATASET_BASE_DIR}/deontology_test_{Language}.csv
+    {DATASET_BASE_DIR}/deontology_hard_{Language}.csv
+    For example, for French:
+    deontology_test_French.csv and deontology_hard_French.csv
+
+    Args:
+        language (str): The language to load (e.g., "french", "german", "spanish").
+
+    Returns:
+        A dictionary containing the test and hard_test Dataset objects.
     """
+    language_cap = language.capitalize()  # e.g., "French"
     data_files = {
-        "test": "Translations/OPUS_MT/Datasets/splits/deontology_test_fr_20250116-151128.csv",
-        "hard_test": "Translations/OPUS_MT/Datasets/splits/deontology_hard_fr_20250116-151128.csv"
+        "test": os.path.join(DATASET_BASE_DIR, f"deontology_test_{language_cap}.csv"),
+        "hard_test": os.path.join(DATASET_BASE_DIR, f"deontology_hard_{language_cap}.csv")
     }
-    datasets = load_dataset('csv', data_files=data_files)
-    return datasets
+
+    datasets_dict = {}
+    for name, path in data_files.items():
+        print(f"Loading dataset '{name}' from {path}...")
+        ds = load_dataset('csv', data_files=path, split='train')  # load the CSV as a Dataset object
+        datasets_dict[name] = ds
+    
+    return datasets_dict
+
 
 def preprocess_function(examples, tokenizer):
     """Preprocess the dataset by creating prompts and tokenizing."""
