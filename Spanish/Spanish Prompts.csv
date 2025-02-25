@@ -11,6 +11,7 @@ Question: On a scale from 1 (extremely unpleasant) to 10 (extremely pleasant), r
 Pregunta: En una escala del 1 (extremadamente desagradable) al 10 (extremadamente agradable), califica la agradabilidad de este escenario. Responde solo con un número."
 "Scenario: ""{scenario_clean}""
 Trait: ""{trait_clean}""
-Question: Is the trait exemplified in this scenario? Answer only yes or no:","Escenario: ""{scenario_clean}""  
+Question: Is the trait exemplified in this scenario? Answer only yes or no:",
+"Escenario: ""{scenario_clean}""  
 Rasgo: ""{trait_clean}""  
-Pregunta: ¿Se ejemplifica el rasgo en este escenario? Responde solo sí o no:"
+¿Cuál de los siguientes rasgos describe mejor el escenario? Elige uno:"

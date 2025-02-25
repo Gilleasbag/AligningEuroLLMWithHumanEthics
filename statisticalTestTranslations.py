@@ -83,9 +83,32 @@ file_paths = {
 # ANALYSIS FUNCTIONS
 # ========================
 def load_scores(csv_path):
-    """Load scores from CSV, skipping header and first row (average)"""
-    df = pd.read_csv(csv_path, header=None, skiprows=2)
-    return df[0].values
+    """Load scores from CSV, skipping header and first row (average if present)"""
+    # Read the CSV file
+    df = pd.read_csv(csv_path, header=0)
+    
+    # Drop any rows where all columns are NaN
+    df = df.dropna(how='all')
+    
+    # Reset the index after dropping rows
+    df = df.reset_index(drop=True)
+    
+    # Check and remove any rows that are not part of the data
+    # For example, if the first row contains 'average' in the first column, drop it
+    if len(df) > 0:
+        first_value = df.iloc[0, 0]
+        if isinstance(first_value, str) and 'average' in first_value.lower():
+            df = df.drop(index=0)
+            df = df.reset_index(drop=True)
+    
+    # Convert all score columns to numeric, errors='coerce' will convert invalid parsing to NaN
+    score_columns = df.columns
+    df[score_columns] = df[score_columns].apply(pd.to_numeric, errors='coerce')
+    
+    # Drop any rows with NaN values in all score columns
+    df = df.dropna(subset=score_columns, how='all')
+    
+    return df
 
 def bootstrap_mean_difference(sample1, sample2, n_bootstraps=10000, ci=95):
     """Calculate bootstrap confidence interval for mean difference"""
@@ -95,7 +118,7 @@ def bootstrap_mean_difference(sample1, sample2, n_bootstraps=10000, ci=95):
     
     for i in range(n_bootstraps):
         indices = np.random.choice(n, n, replace=True)
-        bootstrap_diffs[i] = np.mean(sample1[indices] - sample2[indices])
+        bootstrap_diffs[i] = np.mean(sample1.iloc[indices] - sample2.iloc[indices])
     
     alpha = (100 - ci) / 2
     ci_lower, ci_upper = np.percentile(bootstrap_diffs, [alpha, 100 - alpha])
@@ -131,38 +154,55 @@ def main():
             print(f"\nAnalyzing {framework} - {lang.upper()}")
             
             try:
-                opus = load_scores(file_paths[framework][lang]['OPUS'])
-                gpt = load_scores(file_paths[framework][lang]['GPT'])
-                analysis = analyze_pair(opus, gpt)
+                # Load scores as DataFrames
+                opus_df = load_scores(file_paths[framework][lang]['OPUS'])
+                gpt_df = load_scores(file_paths[framework][lang]['GPT'])
                 
-                results.append({
-                    'Ethical Framework': framework,
-                    'Language': lang.upper(),
-                    'OPUS Mean': analysis['opus_mean'],
-                    'GPT Mean': analysis['gpt_mean'],
-                    'Mean Difference': analysis['mean_diff'],
-                    'CI Lower': analysis['ci_lower'],
-                    'CI Upper': analysis['ci_upper'],
-                    'P-Value': analysis['p_value'],  # Already formatted as string
-                    'Significance': 'Yes' if analysis['significant'] else 'No',
-                    'Sample Size': analysis['sample_size']
-                })
+                # Ensure both DataFrames have the same columns
+                common_columns = opus_df.columns.intersection(gpt_df.columns)
+                if len(common_columns) == 0:
+                    raise ValueError("No common COMET score columns found between OPUS and GPT data.")
+                
+                for score_col in common_columns:
+                    opus_scores = opus_df[score_col].reset_index(drop=True)
+                    gpt_scores = gpt_df[score_col].reset_index(drop=True)
+                    
+                    if len(opus_scores) != len(gpt_scores):
+                        min_length = min(len(opus_scores), len(gpt_scores))
+                        opus_scores = opus_scores.iloc[:min_length]
+                        gpt_scores = gpt_scores.iloc[:min_length]
+                    
+                    analysis = analyze_pair(opus_scores, gpt_scores)
+                    
+                    results.append({
+                        'Ethical Framework': framework,
+                        'Language': lang.upper(),
+                        'Score Type': score_col,
+                        'OPUS Mean': analysis['opus_mean'],
+                        'GPT Mean': analysis['gpt_mean'],
+                        'Mean Difference': analysis['mean_diff'],
+                        'CI Lower': analysis['ci_lower'],
+                        'CI Upper': analysis['ci_upper'],
+                        'P-Value': analysis['p_value'],  # Already formatted as string
+                        'Significance': 'Yes' if analysis['significant'] else 'No',
+                        'Sample Size': analysis['sample_size']
+                    })
                 
             except Exception as e:
                 print(f"Error processing {framework}-{lang}: {str(e)}")
                 continue
     
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values(by=['Ethical Framework', 'Language'])
+    results_df = results_df.sort_values(by=['Ethical Framework', 'Language', 'Score Type'])
     
-    # Format numerical columns while preserving scientific notation for p-values
+    # Format numerical columns
     float_cols = ['OPUS Mean', 'GPT Mean', 'Mean Difference', 'CI Lower', 'CI Upper']
     results_df[float_cols] = results_df[float_cols].round(4)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = f"comet_analysis_results_{timestamp}.csv"
     
-    # Save with different formatting for different columns
+    # Save the results to CSV
     results_df.to_csv(output_file, index=False)
     print(f"\nAnalysis complete! Results saved to {output_file}")
 

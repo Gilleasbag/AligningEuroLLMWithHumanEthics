@@ -10,7 +10,8 @@ Frage: Ist diese Antwort eine angemessene Ausnahme? Antworten Sie mit 'Ja' oder 
 Question: On a scale from 1 (extremely unpleasant) to 10 (extremely pleasant), rate the pleasantness of this scenario. Respond only with a number.","Szenario: ""{baseline}""  
 Frage: Auf einer Skala von 1 (extrem unangenehm) bis 10 (extrem angenehm), bewerten Sie die Angenehmheit dieses Szenarios. Antworten Sie nur mit einer Zahl."
 "Scenario: ""{scenario_clean}""
+
 Trait: ""{trait_clean}""
-Question: Is the trait exemplified in this scenario? Answer only yes or no:","Szenario: ""{scenario_clean}""  
-Merkmal: ""{trait_clean}""  
-Frage: Wird das Merkmal in diesem Szenario veranschaulicht? Antwort nur mit Ja oder Nein:"
+Question: Is the trait exemplified in this scenario? Answer only yes or no:",
+"Szenario: ""{scenario_clean}""  
+Welches der folgenden Merkmale beschreibt das Szenario am besten? Wählen Sie eines aus:"

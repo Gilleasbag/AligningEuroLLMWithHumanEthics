@@ -1,57 +1,55 @@
+import csv
 import os
-import openai
-from datasets import load_dataset
 
-API_KEY = os.getenv('OPENAI_API_KEY')
-if not API_KEY:
-    raise ValueError("Please set the OPENAI_API_KEY environment variable.")
+# List of dataset files
+dataset_files = [
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_hard_French.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_hard_German.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_hard_Spanish.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_test_French.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_test_German.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_test_Spanish.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_train_French.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_train_German.csv',
+    '/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_train_Spanish.csv'
+]
 
-API_BASE_URL = 'https://api.openai.com/v1'
-HEADERS = {
-    'Authorization': f'Bearer {API_KEY}',
-}
+# Process each file
+for input_file in dataset_files:
+    output_file = os.path.splitext(input_file)[0] + '_modified.csv'  # Create output file name
 
-def setup_openai_client():
-    api_key = os.getenv('OPENAI_API_KEY')  # Get API key from environment variable for security
-    return openai.OpenAI(api_key=api_key)
+    # Read the CSV data
+    with open(input_file, mode='r', encoding='utf-8') as infile:
+        reader = csv.reader(infile)
+        header = next(reader)  # Skip the header
+        data = list(reader)
 
-# Function to handle translation using the OpenAI Chat API
-def translate_text(openai_client, text, target_language):
-    response = openai_client.chat.completions.create(
-        model="gpt-4o-mini",  # Ensure this model is correct
-        messages=[
-            {"role": "user", "content": f"Translate this text to {target_language}: {text}. Give only the translation."}
-        ],
-        max_tokens=1024
-    )
-    translation = response.choices[0].message.content.strip()
-    total_tokens = response.usage.total_tokens
-    completion_tokens = response.usage.completion_tokens
-    prompt_tokens = response.usage.prompt_tokens
-    print(f"Total tokens: {total_tokens}, Completion tokens: {completion_tokens}, Prompt tokens: {prompt_tokens}")
-    print(f"Translation: {translation}")
+    # Process the data
+    modified_data = []
+    for i in range(0, len(data), 5):
+        # Get the group of 5 rows
+        group = data[i:i+5]
+        
+        # Check if the group has at least 1 element
+        if len(group) > 0:
+            # Extract the scenario from the first row
+            first_row = group[0]
+            scenario = first_row[1].split(' [SEP] ')[0]  # Get the scenario before [SEP]
+            trait = first_row[1].split(' [SEP] ')[1] if ' [SEP] ' in first_row[1] else ''  # Get the trait if it exists
+            
+            # Add the first row with its original label and scenario
+            modified_data.append([first_row[0], scenario + (' [SEP] ' + trait if trait else '')])  # First row with original label and scenario
+            
+            # Process the remaining rows
+            for j in range(1, len(group)):
+                # Extract the trait from the current row
+                current_trait = group[j][1].split(' [SEP] ')[1]  # Get the trait after [SEP]
+                modified_data.append([group[j][0], scenario + ' [SEP] ' + current_trait])  # Keep the original label and add the trait
 
-# Load dataset
-def load_and_prepare_data():
-    dataset = load_dataset('hendrycks/ethics', 'commonsense', split='validation+test+train')
-    return dataset
+    # Write the modified data to a new CSV file
+    with open(output_file, mode='w', newline='', encoding='utf-8') as outfile:
+        writer = csv.writer(outfile)
+        writer.writerow(header)  # Write the header back to the output file
+        writer.writerows(modified_data)
 
-def main():
-    client = setup_openai_client()
-    dataset = load_and_prepare_data()
-    target_language = "Spanish"  # You can change the target language here
-
-    # Use only the first example
-    example = dataset[0]
-    text = example['input']
-    label = example['label']
-
-    # Translate the text
-    translate_text(client, text, target_language)
-
-    # Print the results
-    print(f"Original Text: {text}")
-
-
-if __name__ == '__main__':
-    main()
+    print(f"Modified data has been written to {output_file}.")
