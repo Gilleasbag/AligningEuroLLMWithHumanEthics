@@ -87,13 +87,16 @@ def load_scores(csv_path):
     # Read the CSV file
     df = pd.read_csv(csv_path, header=0)
     
+    # Clean column names: strip extra whitespace
+    df.columns = df.columns.str.strip()
+    
     # Drop any rows where all columns are NaN
     df = df.dropna(how='all')
     
     # Reset the index after dropping rows
     df = df.reset_index(drop=True)
     
-    # Check and remove any rows that are not part of the data
+    # Check and remove any rows that are not part of the data.
     # For example, if the first row contains 'average' in the first column, drop it
     if len(df) > 0:
         first_value = df.iloc[0, 0]
@@ -109,6 +112,7 @@ def load_scores(csv_path):
     df = df.dropna(subset=score_columns, how='all')
     
     return df
+
 
 def bootstrap_mean_difference(sample1, sample2, n_bootstraps=10000, ci=95):
     """Calculate bootstrap confidence interval for mean difference"""

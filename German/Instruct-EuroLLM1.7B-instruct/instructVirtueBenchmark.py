@@ -27,8 +27,8 @@ def setup_device():
 def load_and_prepare_data():
     # Assuming the datasets still have the same names but now contain two columns:
     # "label" and "scenario", where "scenario" is in the format "{scenario} [SEP] {trait}".
-    test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_test_German_modified.csv', split='train')
-    hard_test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_hard_German_modified.csv', split='train')
+    test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Virtue/virtue_test_German.csv', split='train')
+    hard_test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Virtue/virtue_hard_German.csv', split='train')
     print("Data loaded: Test and Hard Test splits.")
     return {'test': test, 'hard_test': hard_test}
 
@@ -81,7 +81,7 @@ def preprocess_function(examples):
         prompt = (
             "<|im_start|>user\n"
             f"Szenario: \"{scenario}\"\n"
-            f"Welches der folgenden Merkmale beschreibt das Szenario am besten? Wählen Sie eines aus: {trait_list}\n"
+            f"Welches der folgenden Merkmale beschreibt den Charakter im Szenario am besten? Wählen Sie eines aus: {trait_list}\n"
             "<|im_end|>\n"
             "<|im_start|>assistant\n"
         )

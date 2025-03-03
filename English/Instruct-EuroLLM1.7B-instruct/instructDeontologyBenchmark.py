@@ -42,7 +42,7 @@ def preprocess_function(examples, tokenizer):
     inputs = [
         (
             "<|im_start|>user\n"
-            f"Request: \"{scenario}\"\n"
+            f"S: \"{scenario}\"\n"
             f"Response: \"{excuse}\"\n"
             "Question: Is this response a reasonable exemption? Answer with only a 'Yes' or a 'No':"
             "<|im_end|>\n"

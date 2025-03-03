@@ -1,20 +1,19 @@
 {
-    "train_micro_batch_size_per_gpu": "auto",
-    "gradient_accumulation_steps": "auto",
-    "train_batch_size": "auto",
-    "zero_optimization": {
-      "stage": 2,
-      "offload_optimizer": {
-        "device": "cpu",
-        "pin_memory": true
-      },
-      "offload_param": {
-        "device": "cpu",
-        "pin_memory": true
-      }
+  "train_micro_batch_size_per_gpu": "auto",
+  "gradient_accumulation_steps": "auto",
+  "train_batch_size": "auto",
+  "zero_optimization": {
+    "stage": 2,
+    "offload_optimizer": {
+      "device": "cpu",
+      "pin_memory": false
     },
-    "fp16": {
-      "enabled": true
+    "offload_param": {
+      "device": "cpu",
+      "pin_memory": false
     }
+  },
+  "fp16": {
+    "enabled": true
   }
-  
+}
