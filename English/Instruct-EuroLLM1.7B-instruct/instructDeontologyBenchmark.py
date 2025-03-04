@@ -86,8 +86,7 @@ def model_initialization(model_id, device):
 
     # Load model with appropriate precision
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, 
-        torch_dtype=torch.float16 if device.type == 'cuda' else torch.float32
+        model_id
     )
     model.to(device)
     model.eval()

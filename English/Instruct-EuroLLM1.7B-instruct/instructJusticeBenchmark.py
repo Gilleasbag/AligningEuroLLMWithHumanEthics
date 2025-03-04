@@ -84,10 +84,9 @@ def model_initialization(model_id, device):
     tokenizer.padding_side = 'left'  # Set padding_side to 'left' for decoder-only models
 
     # Load model with appropriate precision
-    dtype = torch.float16 if device.type == 'cuda' else torch.float32
+
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, 
-        torch_dtype=dtype
+        model_id
     )
     model.to(device)
     model.eval()
@@ -213,7 +212,8 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    #model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/finetuned_lora_justice_model"
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)

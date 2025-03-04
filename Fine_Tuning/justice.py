@@ -1,5 +1,5 @@
 """
-fine_tune_commonsense_generation.py
+fine_tune_justice_generation.py
 
 This script loads a justice training dataset from a CSV file ("justice.csv"),
 formats each example into an instruction for text generation, and fine-tunes a
@@ -131,7 +131,7 @@ def main():
 
     # Set training arguments.
     training_args = TrainingArguments(
-        output_dir="./finetuned_commonsense_model",
+        output_dir="./finetuned_justice_model",
         evaluation_strategy="no",
         num_train_epochs=3,
         per_device_train_batch_size=1,       # Adjust based on available GPU memory.
@@ -158,8 +158,8 @@ def main():
     trainer.train()
     
     # Save the model.
-    trainer.save_model("./finetuned_commonsense_model")
-    print("Fine-tuning complete. Model saved as './finetuned_commonsense_model'.")
+    trainer.save_model("./finetuned_justice_model")
+    print("Fine-tuning complete. Model saved as './finetuned_justice_model'.")
 
 if __name__ == "__main__":
     main()

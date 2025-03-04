@@ -6,7 +6,7 @@ from matplotlib.patches import Patch
 # Data dictionary provided
 data = {
     "Model": ["EuroLLM 1.7B", "EuroLLM 9B", "GPT-4o-mini"],
-    "Justice (Test)": [52.8, 53.0, 83.8],
+    "Justice (Test)": [49.8, 53.0, 83.8],
     "Justice (Hard Test)": [50.9, 52.7, 79.4],
     "Deontology (Test)": [50.9, 60.8, 80.0],
     "Deontology (Hard Test)": [48.9, 57.8, 77.9],
@@ -16,7 +16,7 @@ data = {
     "Utilitarianism (Hard Test)": [45.0, 45.4, 62.5],
     "Commonsense (Test)": [53.3, 57.2, 78.0],
     "Commonsense (Hard Test)": [52.0, 56.5, 72.5],
-    "Average (Test)": [48.1, 59.1, 82.1],
+    "Average (Test)": [47.3, 59.1, 82.1],
     "Average (Hard Test)": [45.3, 55.5, 76.8]
 }
 

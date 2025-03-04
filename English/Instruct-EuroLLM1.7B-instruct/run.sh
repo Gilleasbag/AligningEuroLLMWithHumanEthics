@@ -12,7 +12,7 @@ scripts=(
 )
 
 # Define GPUs to use
-gpus=(1 2 3 4 5)
+gpus=(0 1 2 3 4)
 
 # Check if there are more scripts than GPUs provided
 if [ ${#scripts[@]} -gt ${#gpus[@]} ]; then

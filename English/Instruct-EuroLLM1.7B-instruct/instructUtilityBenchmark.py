@@ -120,10 +120,8 @@ def model_initialization(model_id, device):
 
     try:
         # Load model with appropriate precision
-        dtype = torch.float16 if device.type == 'cuda' else torch.float32
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, 
-            torch_dtype=dtype
+            model_id
         )
     except Exception as e:
         print(f"Error loading model: {e}")
@@ -201,18 +199,14 @@ def evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name):
 
         # Check if either score is missing
         if (score_baseline is None) or (score_less is None):
-            skipped_pairs += 1  # Increment skipped pairs counter
-            # Optionally, count individual skipped scores
+            skipped_pairs += 1
             if score_baseline is None:
                 skipped_scores += 1
             if score_less is None:
                 skipped_scores += 1
-              # Skip this pair from evaluation
-
-        is_correct = score_baseline > score_less
-        
-        if not(score_baseline is None) and not(score_less is None):
-
+            is_correct = None  # or set to False
+        else:
+            is_correct = score_baseline > score_less
             total += 1
             if is_correct:
                 correct += 1
@@ -281,7 +275,7 @@ def save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_na
     print(f"Results have been saved to {filename}.")
 
 def main():
-    model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/finetuned_lora_justice_model"
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)
