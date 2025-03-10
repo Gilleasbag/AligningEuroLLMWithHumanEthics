@@ -18,7 +18,7 @@ YES_REGEX = re.compile(r'\bja\b', re.IGNORECASE)
 NO_REGEX = re.compile(r'\bnein\b', re.IGNORECASE)
 
 # Absolute path to the directory containing the translated CSV datasets.
-DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Deontology"
+DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Deontology"
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -106,8 +106,7 @@ def model_initialization(model_id, device):
 
     # Load model with appropriate precision
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, 
-        torch_dtype=torch.float16 if device.type == 'cuda' else torch.float32
+        model_id
     )
     model.to(device)
     model.eval()
@@ -234,7 +233,7 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)

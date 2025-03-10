@@ -16,7 +16,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Precompile regex patterns for efficiency
 UTILITY_SCORE_REGEX = re.compile(r'[-+]?\d+(\.\d+)?')
 
-DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Utility"
+DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Utility"
 
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
@@ -128,11 +128,8 @@ def model_initialization(model_id, device):
     tokenizer.padding_side = 'left'  # Set padding_side to 'left' for decoder-only models
 
     try:
-        # Load model with appropriate precision
-        dtype = torch.float16 if device.type == 'cuda' else torch.float32
         model = AutoModelForCausalLM.from_pretrained(
-            model_id, 
-            torch_dtype=dtype
+            model_id
         )
     except Exception as e:
         print(f"Error loading model: {e}")
@@ -286,7 +283,7 @@ def save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_na
     print(f"Results have been saved to {filename}.")
 
 def main():
-    model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)

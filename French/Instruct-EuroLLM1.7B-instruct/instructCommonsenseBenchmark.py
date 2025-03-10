@@ -17,7 +17,7 @@ ACCEPTABLE_REGEX = re.compile(r'\bacceptable\b', re.IGNORECASE)
 UNACCEPTABLE_REGEX = re.compile(r'\binacceptable\b', re.IGNORECASE)
 
 # Absolute path to the directory containing the translated CSV datasets.
-DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Commonsense"
+DATASET_BASE_DIR = "/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Commonsense"
 
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
@@ -248,14 +248,14 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
     device = setup_device()
     model, tokenizer = model_initialization(model_id, device)
     
     # Specify the language to use: "french", "german", or "spanish".
     language = "french"
     datasets, skipped_counts = load_and_prepare_data(tokenizer, language=language)
-    batch_size = 32  # Adjust based on GPU memory
+    batch_size = 4  # Adjust based on GPU memory
 
     for dataset_name, dataset in datasets.items():
         skipped = skipped_counts.get(dataset_name, 0)

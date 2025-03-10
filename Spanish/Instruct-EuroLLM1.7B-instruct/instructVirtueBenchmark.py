@@ -27,8 +27,8 @@ def setup_device():
 def load_and_prepare_data():
     # Assuming the datasets still have the same names but now contain two columns:
     # "label" and "scenario", where "scenario" is in the format "{scenario} [SEP] {trait}".
-    test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Virtue/virtue_test_Spanish.csv', split='train')
-    hard_test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/OPUS_MT/Datasets/Splits/Virtue/virtue_hard_Spanish.csv', split='train')
+    test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_test_Spanish_modified.csv', split='train')
+    hard_test = load_dataset('csv', data_files='/fs/nas/eikthyrnir0/gpeterson/Translations/openAI/Datasets/Splits/Virtue/virtue_hard_Spanish_modified.csv', split='train')
     print("Data loaded: Test and Hard Test splits.")
     return {'test': test, 'hard_test': hard_test}
 
@@ -124,9 +124,8 @@ def model_initialization(model_id, device):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = 'left'
-    
-    dtype = torch.float16 if device.type == 'cuda' else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype)
+
+    model = AutoModelForCausalLM.from_pretrained(model_id)
     model.to(device)
     model.eval()
     return model, tokenizer
@@ -206,11 +205,11 @@ def save_results_to_csv(results, accuracy, total_time, dataset_name):
     print(f"Results for '{dataset_name}' saved to {filename}.")
 
 def main():
-    model_id = "utter-project/EuroLLM-1.7B-Instruct"
+    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)
-    batch_size = 128
+    batch_size = 64
     
     for dataset_name, dataset in datasets.items():
         print(f"Processing dataset: {dataset_name}")

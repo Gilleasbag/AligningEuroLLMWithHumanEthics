@@ -8,6 +8,7 @@ from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorWithPadding
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
+import argparse  # Added import
 
 # Set environment variables before importing other libraries
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -15,6 +16,18 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Precompile regex patterns for efficiency
 UTILITY_SCORE_REGEX = re.compile(r'[-+]?\d+(\.\d+)?')
+
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description="Evaluate a fine-tuned language model on ethics datasets.")
+    parser.add_argument(
+        "--model_id",
+        type=str,
+        required=True,
+        help="Path or identifier for the pre-trained model."
+    )
+    # You can add additional arguments (e.g., batch_size, dataset split) here if needed.
+    return parser.parse_args()
 
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
@@ -120,9 +133,7 @@ def model_initialization(model_id, device):
 
     try:
         # Load model with appropriate precision
-        model = AutoModelForCausalLM.from_pretrained(
-            model_id
-        )
+        model = AutoModelForCausalLM.from_pretrained(model_id)
     except Exception as e:
         print(f"Error loading model: {e}")
         exit(1)
@@ -131,7 +142,7 @@ def model_initialization(model_id, device):
     model.eval()
     return model, tokenizer
 
-def evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name):
+def evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name, model_id):
     """Evaluate the model using the DataLoader and save results to CSV."""
     start_time = time.time()
 
@@ -222,7 +233,7 @@ def evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name):
             is_correct
         ])
 
-        # Update progress metrics in the progress bar
+        # Optionally update progress metrics
         if total > 0:
             progress_bar.set_postfix({
                 'Accuracy': f"{correct / total * 100:.2f}%",
@@ -241,14 +252,15 @@ def evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name):
     total_time = end_time - start_time
     print(f"Total evaluation time: {total_time:.2f} seconds")
 
-    # Save results to CSV
-    save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_name, skipped_scores)
+    # Save results to CSV with model_id prepended to the filename.
+    save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_name, skipped_scores, model_id)
 
-def save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_name, skipped_scores):
+def save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_name, skipped_scores, model_id):
     """Save the evaluation results to a CSV file, including metrics."""
     timestamp = dt.now().strftime('%Y%m%d-%H%M%S')
     name = dataset_name
-    filename = f'evaluation_results_instruct_utility_{name}_{timestamp}.csv'
+    sanitised_model_id = os.path.basename(model_id.rstrip('/'))
+    filename = f'utility_{sanitised_model_id}_{name}_{timestamp}.csv'
     
     with open(filename, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
@@ -275,7 +287,8 @@ def save_results_to_csv(results, accuracy, total_time, skipped_pairs, dataset_na
     print(f"Results have been saved to {filename}.")
 
 def main():
-    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/finetuned_lora_justice_model"
+    args = parse_args()
+    model_id = args.model_id
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)
@@ -284,7 +297,7 @@ def main():
     for dataset_name, dataset in datasets.items():
         print(f"\nProcessing dataset: {dataset_name}")
         dataloader = create_dataloader(dataset, tokenizer, batch_size)
-        evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name)  # Pass dataset object
+        evaluate_model(model, tokenizer, device, dataloader, dataset, dataset_name, model_id)
 
 if __name__ == '__main__':
     main()

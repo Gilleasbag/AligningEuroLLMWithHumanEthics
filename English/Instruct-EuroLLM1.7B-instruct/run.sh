@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Script to run different Python scripts on specific GPUs
+# Script to run different Python scripts on specific GPUs with multiple model paths,
+# executing all tests for one model before moving to the next.
 
 # List of Python files
 scripts=(
@@ -11,25 +12,35 @@ scripts=(
     "instructUtilityBenchmark.py"
 )
 
+# List of model paths to test
+models=(
+    "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr1e-05_bs1_ep4"
+    "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr2e-05_bs1_ep4"
+    "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
+)
+
 # Define GPUs to use
 gpus=(0 1 2 3 4)
 
-# Check if there are more scripts than GPUs provided
-if [ ${#scripts[@]} -gt ${#gpus[@]} ]; then
-    echo "Error: There are more scripts than available GPUs."
-    exit 1
-fi
-
-# Loop through the scripts and assign each to a specific GPU from the predefined list
-for ((i=0; i<${#scripts[@]}; i++))
+# Loop through each model path
+for model in "${models[@]}"
 do
-    # Get corresponding GPU index from the 'gpus' array
-    gpu_index=${gpus[$i]}
+    echo "Starting tests for model ${model}..."
+    
+    # Reset the counter for GPU assignment for this group of scripts
+    counter=0
+    for script in "${scripts[@]}"
+    do
+        # Assign GPU in a round-robin fashion based on the available GPUs
+        gpu_index=${gpus[$(( counter % ${#gpus[@]} ))]}
+        echo "Running ${script} with model ${model} on GPU ${gpu_index}"
+        CUDA_VISIBLE_DEVICES=$gpu_index python "$script" --model_id "$model" &
+        ((counter++))
+    done
 
-    # Set CUDA_VISIBLE_DEVICES to assign a specific GPU
-    CUDA_VISIBLE_DEVICES=$gpu_index python ${scripts[$i]} &
+    # Wait for all background processes of this model group to finish before moving on
+    wait
+    echo "Completed tests for model ${model}."
 done
 
-# Wait for all background processes to finish
-wait
-echo "All scripts have been executed."
+echo "All tests have been executed."

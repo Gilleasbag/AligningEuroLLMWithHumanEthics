@@ -17,6 +17,21 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 ACCEPTABLE_REGEX = re.compile(r'\bacceptable\b', re.IGNORECASE)
 UNACCEPTABLE_REGEX = re.compile(r'\bunacceptable\b', re.IGNORECASE)
 
+import argparse  # Add this import
+
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description="Evaluate a fine-tuned language model on ethics datasets.")
+    parser.add_argument(
+        "--model_id",
+        type=str,
+        required=True,
+        help="Path or identifier for the pre-trained model."
+    )
+    # You can add additional arguments (e.g., batch_size, dataset split) here if needed.
+    return parser.parse_args()
+
+
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -137,7 +152,7 @@ def model_initialization(model_id, device):
     model.eval()
     return model, tokenizer
 
-def evaluate_model(model, tokenizer, device, dataloader, dataset_name):
+def evaluate_model(model, tokenizer, device, dataloader, dataset_name, model_id):
     """Evaluate the model on the provided dataloader."""
     print(f"Starting evaluation on the '{dataset_name}' dataset...")
     start_time = time.time()
@@ -192,7 +207,6 @@ def evaluate_model(model, tokenizer, device, dataloader, dataset_name):
                         else:
                             fn += 1
 
-
                 input_prompt = tokenizer.decode(input_id, skip_special_tokens=True)
                 results.append([
                     input_prompt,
@@ -211,15 +225,17 @@ def evaluate_model(model, tokenizer, device, dataloader, dataset_name):
     total_time = time.time() - start_time
     save_results_to_csv(
         results, accuracy, total_time, precision, recall, f1_score, fpr,
-        tp, tn, fp, fn, dataset_name
+        tp, tn, fp, fn, dataset_name, model_id
     )
 
     print(f"Evaluation on '{dataset_name}' completed.\n")
 
-def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_score, fpr, tp, tn, fp, fn, dataset_name):
+
+def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_score, fpr, tp, tn, fp, fn, dataset_name, model_id):
     """Save the evaluation results to a CSV file."""
     current_time = datetime.now().strftime('%Y%m%d-%H%M%S')
-    filename = f'evaluation_results_{dataset_name}_{current_time}.csv'
+    sanitisedModelId = os.path.basename(model_id.rstrip('/'))
+    filename = f'commonsense_{sanitisedModelId}_{dataset_name}_{current_time}.csv'
 
     with open(filename, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
@@ -246,7 +262,8 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/finetuned_lora_justice_model"
+    args = parse_args()           # Parse the command-line arguments
+    model_id = args.model_id      # Use the CLI provided model_id
     device = setup_device()
     model, tokenizer = model_initialization(model_id, device)
     
@@ -258,7 +275,8 @@ def main():
         skipped = skipped_counts.get(dataset_name, 0)
         print(f"Dataset '{dataset_name}': Skipped {skipped} prompts exceeding 1024 tokens.")
         dataloader = create_dataloader(dataset, tokenizer, batch_size)
-        evaluate_model(model, tokenizer, device, dataloader, dataset_name)
+        evaluate_model(model, tokenizer, device, dataloader, dataset_name, model_id)
+
 
 if __name__ == '__main__':
     main()

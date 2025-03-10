@@ -1,17 +1,27 @@
 import os
-import torch # type: ignore
+import torch  # type: ignore
 import csv
 import re
 import time
 import random  # Added for shuffling
 from datetime import datetime as dt
-from datasets import load_dataset # type: ignore
-from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorWithPadding # type: ignore
-from torch.utils.data import DataLoader # type: ignore
-from tqdm.auto import tqdm # type: ignore
+from datasets import load_dataset  # type: ignore
+from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorWithPadding  # type: ignore
+from torch.utils.data import DataLoader  # type: ignore
+from tqdm.auto import tqdm  # type: ignore
+import argparse  # Added import
 
-# Set environment variables before importing other libraries
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description="Evaluate a fine-tuned language model on ethics datasets.")
+    parser.add_argument(
+        "--model_id",
+        type=str,
+        required=True,
+        help="Path or identifier for the pre-trained model."
+    )
+    # You can add additional arguments (e.g., batch_size, dataset split) here if needed.
+    return parser.parse_args()
 
 def setup_device():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -116,7 +126,6 @@ def create_dataloader(dataset, tokenizer, batch_size):
     )
     return dataloader, labels, metadata
 
-
 def model_initialization(model_id, device):
     tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
     if tokenizer.pad_token is None:
@@ -128,7 +137,7 @@ def model_initialization(model_id, device):
     model.eval()
     return model, tokenizer
 
-def evaluate_model(model, tokenizer, device, dataloader, labels, metadata, dataset_name, batch_size):
+def evaluate_model(model, tokenizer, device, dataloader, labels, metadata, dataset_name, batch_size, model_id):
     print(f"Starting evaluation on the '{dataset_name}' dataset...")
     start_time = time.time()
     
@@ -182,18 +191,20 @@ def evaluate_model(model, tokenizer, device, dataloader, labels, metadata, datas
                     is_correct
                 ])
 
-            
             if device.type == 'cuda':
                 torch.cuda.empty_cache()
     
     accuracy = correct / total if total > 0 else 0
     total_time = time.time() - start_time
     print(f"Dataset: {dataset_name} - Accuracy: {accuracy:.2%}, Time: {total_time:.2f} sec")
-    save_results_to_csv(results, accuracy, total_time, dataset_name)
+    save_results_to_csv(results, accuracy, total_time, dataset_name, model_id)
 
-def save_results_to_csv(results, accuracy, total_time, dataset_name):
+def save_results_to_csv(results, accuracy, total_time, dataset_name, model_id):
+    """Save the evaluation results to a CSV file, including metrics.
+       The model_id is prepended to the filename."""
     timestamp = dt.now().strftime('%Y%m%d-%H%M%S')
-    filename = f'evaluation_results_instruct_virtue_{dataset_name}_{timestamp}.csv'
+    sanitized_model_id = os.path.basename(model_id.rstrip('/'))
+    filename = f'virtue_{sanitized_model_id}_{dataset_name}_{timestamp}.csv'
     with open(filename, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow([f'Dataset: {dataset_name}', f'Accuracy: {accuracy:.2%}', f'Total Evaluation Time: {total_time:.2f} sec'])
@@ -203,7 +214,9 @@ def save_results_to_csv(results, accuracy, total_time, dataset_name):
     print(f"Results for '{dataset_name}' saved to {filename}.")
 
 def main():
-    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/finetuned_lora_justice_model"
+    #model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr1e-05_bs1_ep4"
+    args = parse_args()
+    model_id = args.model_id
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)
@@ -212,7 +225,7 @@ def main():
     for dataset_name, dataset in datasets.items():
         print(f"Processing dataset: {dataset_name}")
         dataloader, labels, metadata = create_dataloader(dataset, tokenizer, batch_size)
-        evaluate_model(model, tokenizer, device, dataloader, labels, metadata, dataset_name, batch_size)
+        evaluate_model(model, tokenizer, device, dataloader, labels, metadata, dataset_name, batch_size, model_id)
 
 if __name__ == '__main__':
     main()

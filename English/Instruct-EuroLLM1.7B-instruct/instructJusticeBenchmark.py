@@ -8,6 +8,7 @@ from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorWithPadding
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
+import argparse  # Added import
 
 # Set environment variables before importing other libraries
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -16,6 +17,18 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Precompile regex patterns for efficiency
 YES_REGEX = re.compile(r'\breasonable\b', re.IGNORECASE)
 NO_REGEX = re.compile(r'\bunreasonable\b', re.IGNORECASE)
+
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description="Evaluate a fine-tuned language model on ethics datasets.")
+    parser.add_argument(
+        "--model_id",
+        type=str,
+        required=True,
+        help="Path or identifier for the pre-trained model."
+    )
+    # You can add additional arguments (e.g., batch_size, dataset split) here if needed.
+    return parser.parse_args()
 
 def setup_device():
     """Set up GPU device if available; otherwise, use CPU."""
@@ -84,15 +97,12 @@ def model_initialization(model_id, device):
     tokenizer.padding_side = 'left'  # Set padding_side to 'left' for decoder-only models
 
     # Load model with appropriate precision
-
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id
-    )
+    model = AutoModelForCausalLM.from_pretrained(model_id)
     model.to(device)
     model.eval()
     return model, tokenizer
 
-def evaluate_model(model, tokenizer, device, dataloader, dataset_name):
+def evaluate_model(model, tokenizer, device, dataloader, dataset_name, model_id):
     """Evaluate the model on the provided dataloader."""
     print(f"Starting evaluation on the '{dataset_name}' dataset...")
     start_time = time.time()
@@ -176,16 +186,18 @@ def evaluate_model(model, tokenizer, device, dataloader, dataset_name):
     total_time = time.time() - start_time
     print(f"Total evaluation time: {total_time:.2f} seconds\n")
 
-    # Save results to CSV
+    # Save results to CSV with model_id prepended to the filename.
     save_results_to_csv(
         results, accuracy, total_time, precision, recall, f1_score, fpr,
-        tp, tn, fp, fn, dataset_name
+        tp, tn, fp, fn, dataset_name, model_id
     )
 
-def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_score, fpr, tp, tn, fp, fn, dataset_name):
+def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_score, fpr, tp, tn, fp, fn, dataset_name, model_id):
     """Save the evaluation results to a CSV file."""
     timestamp = dt.now().strftime('%Y%m%d-%H%M%S')
-    filename = f'evaluation_results_justice_{dataset_name}_{timestamp}.csv'
+    # Prepend the model_id to the filename. You may want to sanitize model_id if it contains OS-unsupported characters.
+    sanitisedModelId = os.path.basename(model_id.rstrip('/'))
+    filename = f'justice_{sanitisedModelId}_{dataset_name}_{timestamp}.csv'
     
     with open(filename, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
@@ -212,8 +224,8 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    #model_id = "utter-project/EuroLLM-1.7B-Instruct"
-    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/finetuned_lora_justice_model"
+    args = parse_args()
+    model_id = args.model_id
     device = setup_device()
     datasets = load_and_prepare_data()
     model, tokenizer = model_initialization(model_id, device)
@@ -222,7 +234,7 @@ def main():
     for dataset_name, dataset in datasets.items():
         print(f"Processing dataset: {dataset_name}")
         dataloader = create_dataloader(dataset, tokenizer, batch_size)
-        evaluate_model(model, tokenizer, device, dataloader, dataset_name)
+        evaluate_model(model, tokenizer, device, dataloader, dataset_name, model_id)
 
 if __name__ == '__main__':
     main()
