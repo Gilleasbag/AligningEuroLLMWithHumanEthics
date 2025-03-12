@@ -2,7 +2,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
 # Load the model and tokenizer
-model_id = "utter-project/EuroLLM-1.7B-Instruct"
+model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
 

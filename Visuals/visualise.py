@@ -111,15 +111,15 @@ def benchmark():
                         color=color_map_hard[model])
 
     # Set the x-axis ticks and labels.
-    plt.xticks(x, groups, fontsize=12)
+    plt.xticks(x, groups, fontsize=14)
+    #set y ticks labels to be fontsize 15
+    plt.yticks(fontsize=15)
 
     # Set axis labels and title.
-    plt.xlabel('Ethical Theory', fontsize=14)
-    plt.ylabel('Score', fontsize=14)
-    plt.title('Comparison of Models across Ethical Theories and Test Sets', fontsize=16)
+    plt.ylabel('Accuracy(%)', fontsize=16)
 
     # Add legend.
-    plt.legend(fontsize=10, ncol=2, loc='upper left')
+    plt.legend(fontsize=13, ncol=2, loc='upper left')
 
     # Add grid for clarity.
     plt.grid(axis='y', linestyle='--', alpha=0.7)
@@ -141,7 +141,7 @@ def postFT():
         id_vars=['Dataset', 'Split', 'Language'],
         value_vars=['Pre FT', 'Post FT'],
         var_name='Phase',
-        value_name='Score'
+        value_name='Accuracy'
     )
     df_melt["Split_Phase"] = df_melt["Split"] + "-" + df_melt["Phase"]
 
@@ -157,7 +157,6 @@ def postFT():
     # ----------------------------------------------------------------------
     # 3. Set up the Okabe–Ito Palette
     # ----------------------------------------------------------------------
-    # This 8-color palette is a well-known color-blind-friendly set:
     okabe_ito = [
         "#0072B2",  # blue
         "#E69F00",  # orange
@@ -167,24 +166,19 @@ def postFT():
         "#D55E00",  # vermillion
         "#CC79A7",  # reddish purple
     ]
-
-    # Make Seaborn use this palette globally
-    sns.set_theme(style="whitegrid", font_scale=1.0)
+    sns.set_theme(style="whitegrid", font_scale=1.2)  # Increased font scale
     sns.set_palette(okabe_ito)
 
     # ----------------------------------------------------------------------
     # 4. Raw Scores in a 3+2 Centered Layout
-    #    Single legend at figure level, dashed line between Test & Hard
     # ----------------------------------------------------------------------
     if n_plots != 5:
         print("WARNING: Code assumes exactly 5 datasets for the 3+2 layout.")
 
-    # Create main figure for raw scores
-    fig1 = plt.figure(figsize=(15, 8))
-    
+    # Create main figure for raw scores with larger figure size
+    fig1 = plt.figure(figsize=(18, 10))  # Increased figure size
+
     # We'll use 2 rows × 6 columns => 12 slots.
-    # Top row subplots:  (1,2), (3,4), (5,6)
-    # Bottom row subplots: skip #7, use (8,9) & (10,11), skip #12
     positions_raw = [(1,2), (3,4), (5,6), (8,9), (10,11)]
     axes_raw = []
 
@@ -199,17 +193,18 @@ def postFT():
         sns.barplot(
             data=sub,
             x="Split_Phase",
-            y="Score",
+            y="Accuracy",
             hue="Language",
             ax=ax
         )
-        ax.set_title(ds, fontsize=14)
-        ax.set_xlabel("Test/Hard + Phase")
-        ax.set_ylabel("Score")
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+        ax.set_xlabel(" ", fontsize=16)  # Increased font size
+        ax.set_ylabel("Accuracy (%)", fontsize=16)  # Increased font size
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right", fontsize=14)  # Larger tick labels
+        ax.set_yticklabels(ax.get_yticks(), fontsize=14)  # Larger tick labels
+        
+        ax.set_title(ds, fontsize=18)  # Larger title
 
         # Dashed vertical line between categories index=1 and 2
-        # (With 4 categories, Seaborn puts them at x=0,1,2,3)
         ax.axvline(
             x=1.5,
             color='black',
@@ -229,21 +224,19 @@ def postFT():
         labels_raw,
         loc='lower left',
         bbox_to_anchor=(0.01, 0.01),  # adjust if needed
-        fontsize=16
+        fontsize=20  # Larger legend font size
     )
 
-    fig1.suptitle("Accuracy: Pre-FT vs. Post-FT (Test & Hard Combined)", fontsize=16)
-    fig1.tight_layout()
+    fig1.tight_layout()  # Increased padding between subplots
     fig1.savefig("raw_scores_combined.png", dpi=300, bbox_inches="tight")
 
     # ----------------------------------------------------------------------
     # 5. Plot DIFFERENCE (Post FT - Pre FT) in 3+2 Centered Layout
-    #    (with optional same dashed line + single legend)
     # ----------------------------------------------------------------------
     df["Difference"] = df["Post FT"] - df["Pre FT"]
     unique_datasets = sorted(df["Dataset"].unique())  # should match 'datasets'
 
-    fig2 = plt.figure(figsize=(15, 8))
+    fig2 = plt.figure(figsize=(18, 10))  # Increased figure size
     axes_diff = []
     positions_diff = [(1,2), (3,4), (5,6), (8,9), (10,11)]
 
@@ -254,7 +247,7 @@ def postFT():
         # Filter data
         sub = df[df["Dataset"] == ds]
 
-        # We'll use Split on x-axis => "Test" or "Hard"
+        # Plotting the difference
         sns.barplot(
             data=sub,
             x="Split",
@@ -262,9 +255,13 @@ def postFT():
             hue="Language",
             ax=ax
         )
-        ax.set_title(ds, fontsize=12)
-        ax.set_xlabel("Split (Test/Hard)")
-        ax.set_ylabel("Post FT - Pre FT")
+
+        ax.set_xlabel(" ", fontsize=16)  # Increased font size
+        ax.set_ylabel("% Difference", fontsize=16)  # Increased font size
+
+        ax.set_xticklabels(ax.get_xticklabels(), fontsize=14)  # Larger tick labels
+        ax.set_yticklabels(ax.get_yticks(), fontsize=14)  # Larger tick labels    
+        ax.set_title(ds, fontsize=18)  # Larger title
 
         # (Optional) dashed line for 2 categories "Test" vs. "Hard"
         ax.axvline(
@@ -286,17 +283,17 @@ def postFT():
         labels_diff,
         loc='lower left',
         bbox_to_anchor=(0.01, 0.01),
-        fontsize=16
+        fontsize=20  # Larger legend font size
     )
 
-    fig2.suptitle("Difference in Accuracy (Post FT - Pre FT)", fontsize=16)
-    plt.tight_layout()
+    plt.tight_layout()  # Increased padding between subplots
     fig2.savefig("difference_scores_centered.png", dpi=300, bbox_inches="tight")
 
     # ----------------------------------------------------------------------
     # 6. Show Plots
     # ----------------------------------------------------------------------
     plt.show()
+
 def main():
     benchmark()
     postFT()

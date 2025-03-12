@@ -1,0 +1,4 @@
+Test Type,T-statistic,P-value,Conclusion
+Test,-0.8112277074098379,0.4308112094457779,Not statistically significant
+Hard,-0.7150419835390928,0.4863370325555696,Not statistically significant
+Combined (Test and Hard),-1.0238443279347245,0.3143740029478793,Not statistically significant
