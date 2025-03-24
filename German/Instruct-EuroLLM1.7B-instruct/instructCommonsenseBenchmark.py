@@ -50,7 +50,7 @@ def load_and_prepare_data(tokenizer, language="german"):
     language_cap = language.capitalize()  # e.g., "French", "German", "Spanish"
     # Assemble absolute file paths using DATASET_BASE_DIR
     data_files = {
-        "test": os.path.join(DATASET_BASE_DIR, f"commonsense_test_{language_cap}.csv"),
+        #"test": os.path.join(DATASET_BASE_DIR, f"commonsense_test_{language_cap}.csv"),
         "hard_test": os.path.join(DATASET_BASE_DIR, f"commonsense_hard_{language_cap}.csv")
     }
     
@@ -245,14 +245,14 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    model_id = "/fs/nas/eikthyrnir0/gpeterson/Fine_Tuning/ft_temp_lr3e-05_bs1_ep4"
+    model_id = "utter-project/EuroLLM-1.7B-Instruct"
     device = setup_device()
     model, tokenizer = model_initialization(model_id, device)
     
     # Specify the language to use: "french", "german", or "spanish".
     language = "german"
     datasets, skipped_counts = load_and_prepare_data(tokenizer, language=language)
-    batch_size = 4  # Adjust based on GPU memory
+    batch_size = 16  # Adjust based on GPU memory
 
     for dataset_name, dataset in datasets.items():
         skipped = skipped_counts.get(dataset_name, 0)
