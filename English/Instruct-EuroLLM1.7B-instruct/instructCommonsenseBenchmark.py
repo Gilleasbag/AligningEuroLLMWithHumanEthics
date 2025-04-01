@@ -262,8 +262,9 @@ def save_results_to_csv(results, accuracy, total_time, precision, recall, f1_sco
     print(f"Results for '{dataset_name}' have been saved to {filename}.\n")
 
 def main():
-    args = parse_args()           # Parse the command-line arguments
-    model_id = args.model_id      # Use the CLI provided model_id
+    #args = parse_args()           # Parse the command-line arguments
+    #model_id = args.model_id      # Use the CLI provided model_id
+    model_id = "utter-project/EuroLLM-1.7B-Instruct"
     device = setup_device()
     model, tokenizer = model_initialization(model_id, device)
     
