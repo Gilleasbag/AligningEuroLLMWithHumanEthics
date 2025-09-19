@@ -1,6 +1,6 @@
 # Aligning EuroLLM with Human Ethics: Undergraduate Thesis
 
-Welcome to my Thesis respository for Aligning EuroLLM with Human Ethics. This project contains research, code, and multilingual resources.
+Welcome to my Thesis respository for Aligning EuroLLM with Human Ethics. This project contains research, code, and multilingual resources. For the machine translated datasets of the ETHICS dataset, see https://github.com/Gilleasbag/multilingual-ETHICS-datasets.
 
 ## Repository Structure
 
