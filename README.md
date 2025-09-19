@@ -20,7 +20,7 @@ Welcome to my Thesis respository for Aligning EuroLLM with Human Ethics. This pr
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/Gilleasbag/Thesis.git
+   git clone https://github.com/Gilleasbag/AligningEuroLLMWithHumanEthics.git
    ```
 2. Install required packages (if any):
    ```sh
