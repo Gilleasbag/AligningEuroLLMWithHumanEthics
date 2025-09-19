@@ -1,6 +1,6 @@
-# Thesis Project
+# Aligning EuroLLM with Human Ethics: Undergraduate Thesis
 
-Welcome to the Thesis repository! This project contains research, code, and multilingual resources for the thesis work of Gilleasbag.
+Welcome to my Thesis respository for Aligning EuroLLM with Human Ethics. This project contains research, code, and multilingual resources.
 
 ## Repository Structure
 
@@ -31,10 +31,6 @@ Welcome to the Thesis repository! This project contains research, code, and mult
 ## Contributing
 
 If you wish to contribute, please fork the repository and submit a pull request.
-
-## License
-
-Please specify your license here (MIT, GPL, etc.) or add a LICENSE file.
 
 ## Contact
 
